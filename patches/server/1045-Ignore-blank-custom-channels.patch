@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joo200 <github@joo200.de>
+Date: Fri, 3 Nov 2023 20:18:40 +0100
+Subject: [PATCH] Ignore blank custom channels
+
+We already send a trailing \0 to the client so we should allow trailing zeros in responses.
+
+diff --git a/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
+index 598f807f0d0caac98b81e0e2991f1bd497c4534e..c6bdb0d0146fbd1ec9e9e3d871aaa82a0949f708 100644
+--- a/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
++++ b/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
+@@ -131,7 +131,10 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
+             try {
+                 String channels = payload.toString(com.google.common.base.Charsets.UTF_8);
+                 for (String channel : channels.split("\0")) {
+-                    this.getCraftPlayer().addChannel(channel);
++                    // Paper start - Ignore empty channel names
++                    if (channel.isBlank()) ServerGamePacketListenerImpl.LOGGER.debug("Ignored register request for blank channel");
++                    else this.getCraftPlayer().addChannel(channel);
++                    // Paper end
+                 }
+             } catch (Exception ex) {
+                 ServerGamePacketListenerImpl.LOGGER.error("Couldn\'t register custom payload", ex);
+@@ -141,7 +144,10 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
+             try {
+                 String channels = payload.toString(com.google.common.base.Charsets.UTF_8);
+                 for (String channel : channels.split("\0")) {
+-                    this.getCraftPlayer().removeChannel(channel);
++                    // Paper start - Ignore empty channel names
++                    if (channel.isBlank()) ServerGamePacketListenerImpl.LOGGER.debug("Ignored unregister request for blank channel");
++                    else this.getCraftPlayer().removeChannel(channel);
++                    // Paper end
+                 }
+             } catch (Exception ex) {
+                 ServerGamePacketListenerImpl.LOGGER.error("Couldn\'t unregister custom payload", ex);
