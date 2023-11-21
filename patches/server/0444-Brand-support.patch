@@ -48,7 +48,7 @@ index d25b6431ce617d90fd1d6489a308d6630b92c175..96ee68e6656a59d959ad7a7e78f5a375
 +                if (identifier.equals(MINECRAFT_BRAND)) {
 +                    try {
 +                        this.player.clientBrandName = new net.minecraft.network.FriendlyByteBuf(io.netty.buffer.Unpooled.copiedBuffer(data)).readUtf(256);
-+                    } catch (StringIndexOutOfBoundsException ex) {
++                    } catch (IndexOutOfBoundsException ex) {
 +                        this.player.clientBrandName = "illegal";
 +                    }
 +                }
